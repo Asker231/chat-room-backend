@@ -11,10 +11,12 @@ import (
 
 type AuthHandler struct{
 	Config *config.AppConfig
+	Service *AuthService
 }
-func NewAuthHandler(router *http.ServeMux,conf *config.AppConfig){
+func NewAuthHandler(router *http.ServeMux,conf *config.AppConfig,service *AuthService){
 	handler := &AuthHandler{
 		Config: conf,
+		Service: service,
 	}
 
 	router.HandleFunc("POST /auth/register",handler.Register())
@@ -29,11 +31,17 @@ func(handler *AuthHandler)Register()http.HandlerFunc{
 			res.ResponseBody(w,err.Error(),404)
 			return
 		}	
-		res.ResponseBody(w,RegisterResponse{
-			Token: "199823231998",
-		},200)
 
-		fmt.Println(body)
+		user,err := handler.Service.Register(body.Name,body.Email,body.Password)
+		if err != nil{
+			return
+		}
+
+		res.ResponseBody(w,user,201)
+
+		// res.ResponseBody(w,RegisterResponse{
+		// 	Token: "199823231998",
+		// },200)
 	}
 }
 func(handler *AuthHandler)Login()http.HandlerFunc{

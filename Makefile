@@ -5,4 +5,4 @@ startDB:
 stopDB:
 	docker-compose down
 migrate:
-	go run migrate/main.go			
+	go run migration/main.go			
